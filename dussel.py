@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(page_title="Cuadro Sinóptico: Dussel",
                    page_icon="🦅", layout="wide")
 
-# Estilos personalizados para darle un toque académico y humanístico
+# Estilos personalizados
 st.markdown("""
     <style>
     .titulo-principal { font-size: 36px; font-weight: bold; color: #2C3E50; }
@@ -13,13 +13,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Función de callback para reiniciar el estado de las respuestas
+
+
+def reiniciar_interactivo():
+    for i in range(1, 10):
+        key = f"q{i}"
+        if key in st.session_state:
+            st.session_state[key] = ""
+
+
 # Encabezado
 st.markdown('<p class="titulo-principal">☀️ Cuadro Sinóptico Interactivo: Europa, modernidad y eurocentrismo 🦅</p>', unsafe_allow_html=True)
 st.write("**Autor:** Enrique Dussel | **Área:** Ciencias Sociales y Filosofía Latinoamericana")
 st.markdown('<p class="instrucciones">📜 Instrucciones: Lee las premisas del cuadro sinóptico y completa los espacios en blanco con los conceptos clave del texto. Presiona "Verificar Respuestas" al final para evaluar tu comprensión.</p>', unsafe_allow_html=True)
 st.divider()
 
-# Variables de estado para las respuestas
+# Variables de estado para las respuestas correctas
 respuestas_correctas = {
     "q1": ["semita", "semítico"],
     "q2": ["romanticismo", "romanticismo aleman", "romanticismo alemán"],
@@ -84,8 +94,19 @@ with col3:
 
 st.divider()
 
-# Botón de verificación
-if st.button("🦅 Verificar Respuestas 🌽"):
+# --- BOTONES DE ACCIÓN ---
+col_btn1, col_btn2 = st.columns([1, 1])
+
+with col_btn1:
+    verificar = st.button("🦅 Verificar Respuestas 🌽", use_container_width=True)
+
+with col_btn2:
+    # Este botón llama a la función reiniciar_interactivo antes de recargar la app
+    st.button("🔄 Reiniciar Interactivo",
+              on_click=reiniciar_interactivo, use_container_width=True)
+
+# Lógica de verificación
+if verificar:
     aciertos = 0
     respuestas_usuario = {
         "q1": q1.strip().lower(), "q2": q2.strip().lower(), "q3": q3.strip().lower(),
@@ -93,12 +114,10 @@ if st.button("🦅 Verificar Respuestas 🌽"):
         "q7": q7.strip().lower(), "q8": q8.strip().lower(), "q9": q9.strip().lower()
     }
 
-    # Evaluar
     for key, correctas in respuestas_correctas.items():
         if respuestas_usuario[key] in correctas:
             aciertos += 1
 
-    # Resultados
     st.subheader(f"Resultados: {aciertos} / 9 aciertos")
     if aciertos == 9:
         st.success("¡Excelente! ☀️ Has comprendido a la perfección la crítica al eurocentrismo y el proyecto de la Transmodernidad propuesto por Dussel.")
